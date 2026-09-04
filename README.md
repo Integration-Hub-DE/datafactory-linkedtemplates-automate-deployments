@@ -60,7 +60,7 @@ Continuous Deployment (CD)
 
 #### Step 2 - Create a Federated Secret under the App Registration
 
-> Instead of using a Client Secret, this solution uses GitHub OpenID Connect (OIDC) Federation to securely authenticate GitHub Actions with Microsoft Entra ID.>
+> Instead of using a Client Secret, this solution uses GitHub OpenID Connect (OIDC) Federation to securely authenticate GitHub Actions with Microsoft Entra ID.
 
 > Federated Credentials establish a trust relationship between GitHub and Azure, allowing GitHub Actions workflows to obtain short-lived access tokens directly from Microsoft Entra ID without storing credentials in the repository.
 
