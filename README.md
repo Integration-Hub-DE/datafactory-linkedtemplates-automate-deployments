@@ -85,6 +85,8 @@ Configure the following GitHub Secrets before running the workflow:
 | AZURE_RESOURCEGROUP_NAME | Resource Group Hosting ADF | ADF → Overview |
 | SOURCE_DATA_FACTORY | Source ADF Name | ADF → Overview |
 | DESTINATION_DATA_FACTORY | Destination ADF Name | ADF → Overview |
+| ARM_TEMPLATE_STORAGE_ACCOUNT | Storage Account Name | Storage Account → Overview |
+| ARM_TEMPLATE_CONTAINER | Storage Account Container Name | |
 
 #### Step 5 - Build Folder
 
