@@ -4,9 +4,9 @@ name: ADF CI-CD using Linked ARM Templates
 
 on:                                    # Triggers the workflow on push or pull request events but only for the "<branch-name>" branch
   push:
-    branches: [ "main" ]
+    branches: [ "<branch-name>" ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ "<branch-name>" ]
   
   workflow_dispatch:                   # Allows you to run this workflow manually from the Actions tab
 
