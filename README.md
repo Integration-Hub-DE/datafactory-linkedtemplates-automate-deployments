@@ -93,8 +93,6 @@ Continuous Deployment (CD)
 
 > Required Storage Blob Data Contributor role on the Storage Account to allow the Service Principal to upload, read, and delete linked template artifacts.
 
-This allows the SPN to create/update the Azure resources defined in the ARM templates. and Storage Blob Data Contributor
-
 #### Step 4 - Configure Azure Storage for Linked Templates
 
 > Linked ARM Templates require an Azure Storage Account to host the generated template artifacts referenced by ARMTemplate_master.json during deployment.
