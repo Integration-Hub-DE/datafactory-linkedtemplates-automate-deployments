@@ -17,7 +17,7 @@ permissions:
 jobs:
 
 # -------------------
-# CI Stage - Validate and Generate ARM Template from Source ADF
+# CI Stage - Validate and Generate ARM Template
 # -------------------  
 
   Continuous-Integration:
