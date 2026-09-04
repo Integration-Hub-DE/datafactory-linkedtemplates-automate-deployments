@@ -121,7 +121,7 @@ jobs:
         # Prevent the SAS token from appearing in workflow logs.
         Write-Host "::add-mask::$sasToken"
         
-        $containerUri = "https://${{ secrets.ARM_TEMPLATE_STORAGE_ACCOUNT }}.blob.core.windows.net/${{ secrets.ARM_TEMPLATE_CONTAINER }}/${{ steps.upload-templates.outputs.template-folder }}"
+        $containerUri = "https://${{ secrets.ARM_TEMPLATE_STORAGE_ACCOUNT }}.blob.core.windows.net/${{ secrets.ARM_TEMPLATE_CONTAINER }}/${{ steps.upload-templates.outputs.template-folder }}/linkedTemplates/"
         "container-uri=$containerUri" >> $env:GITHUB_OUTPUT
         "container-sas-token=$sasToken" >> $env:GITHUB_OUTPUT
 
