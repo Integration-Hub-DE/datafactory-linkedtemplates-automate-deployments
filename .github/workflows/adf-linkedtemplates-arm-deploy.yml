@@ -85,7 +85,7 @@ jobs:
         az storage blob upload-batch `
           --account-name "${{ secrets.ARM_TEMPLATE_STORAGE_ACCOUNT }}" `
           --destination "${{ secrets.ARM_TEMPLATE_CONTAINER }}/$folderName" `
-          --source "${{ github.workspace }}\ArmTemplates\linkedTemplates" `
+          --source "${{ github.workspace }}\ArmTemplates" `
           --auth-mode login `
           --only-show-errors
 
