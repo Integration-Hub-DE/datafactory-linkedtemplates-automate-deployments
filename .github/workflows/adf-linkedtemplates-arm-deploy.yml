@@ -1,0 +1,86 @@
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push or pull request events but only for the "<branch-name>" branch
+  push:
+    branches: [ "<branch-name>" ]
+  pull_request:
+    branches: [ "<branch-name>" ]
+  
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+  
+jobs:
+# -------------------
+# CI Stage - Validate and Generate ARM Template from Source ADF
+# -------------------  
+  Continuous-Integration:
+    runs-on: windows-latest # The type of runner that the job will run on
+
+    steps: # Steps represent a sequence of tasks that will be executed as part of the job
+      - uses: actions/checkout@v4 # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+
+      #- name: Setup Node.js
+      #  uses: actions/setup-node@v4
+      #  with:
+      #    node-version: '18'
+      
+      - name: Install npm package
+        working-directory: ./build
+        run: npm install
+
+      - name: Validate ARM Template
+        working-directory: ./build
+        run: npm run build validate "${{ github.workspace }}" "/subscriptions/${{ secrets.AZURE_SUBSCRIPTION_ID }}/resourceGroups/${{ secrets.AZURE_RESOURCEGROUP_NAME }}/providers/Microsoft.DataFactory/factories/${{ secrets.SOURCE_DATA_FACTORY }}"
+        
+      - name: Generate ARM Template
+        working-directory: ./build
+        run: npm run build export "${{ github.workspace }}" "/subscriptions/${{ secrets.AZURE_SUBSCRIPTION_ID }}/resourceGroups/${{ secrets.AZURE_RESOURCEGROUP_NAME }}/providers/Microsoft.DataFactory/factories/${{ secrets.SOURCE_DATA_FACTORY }}" "ArmTemplate"
+
+      - name: Upload ARM Template
+        uses: actions/upload-artifact@v4
+        with:
+          name: ArmTemplates
+          path: build/ArmTemplate
+
+# -------------------
+# CD Stage - Deploy to Target ADF
+# -------------------
+
+  Continuous-Delivery:
+
+    needs: Continuous-Integration
+  
+    runs-on: windows-latest
+  
+    steps:
+  
+    - uses: actions/checkout@v4
+  
+    - name: Download ARM Template
+      uses: actions/download-artifact@v4
+      with:
+        name: ArmTemplates
+        path: ArmTemplates
+  
+    - name: Azure Login
+      uses: azure/login@v2
+      with:
+        client-id: ${{ secrets.AZURE_CLIENT_ID }}
+        tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+        subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+  
+    - name: Deploy ARM Template
+      uses: azure/arm-deploy@v2
+      with:
+        scope: resourcegroup
+        subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+        resourceGroupName: ${{ secrets.AZURE_RESOURCEGROUP_NAME }}
+        template: ArmTemplates/ARMTemplateForFactory.json
+        parameters: > 
+          ArmTemplates/ARMTemplateParametersForFactory.json 
+          factoryName=${{ secrets.DESTINATION_DATA_FACTORY }}
+        deploymentMode: Incremental
