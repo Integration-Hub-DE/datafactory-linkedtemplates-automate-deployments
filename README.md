@@ -90,6 +90,7 @@ Continuous Deployment (CD)
 > The Service Principal must have permissions to deploy Azure Data Factory resources.
 
 > Required Contributor role at the target Resource Group, Subscription, or another appropriate deployment scope.
+
 > Required Storage Blob Data Contributor role on the Storage Account to allow the Service Principal to upload, read, and delete linked template artifacts.
 
 This allows the SPN to create/update the Azure resources defined in the ARM templates. and Storage Blob Data Contributor
