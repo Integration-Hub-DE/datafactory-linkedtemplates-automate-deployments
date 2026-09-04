@@ -58,6 +58,8 @@ jobs:
     name: Deploy Linked ARM Templates
     needs: Continuous-Integration
     runs-on: windows-latest
+
+    environment: Production            # This is added for the approval process
   
     steps:
   
