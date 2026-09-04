@@ -138,8 +138,8 @@ jobs:
         scope: resourcegroup
         subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
         resourceGroupName: ${{ secrets.AZURE_RESOURCEGROUP_NAME }}
-        template: ArmTemplates/ARMTemplateForFactory.json
+        template: ArmTemplates/linkedTemplates/ArmTemplate_master.json
         parameters: > 
-          ArmTemplates/ARMTemplateParametersForFactory.json 
+          ArmTemplates/linkedTemplates/ArmTemplateParameters_master.json
           factoryName=${{ secrets.DESTINATION_DATA_FACTORY }}
         deploymentMode: Incremental
