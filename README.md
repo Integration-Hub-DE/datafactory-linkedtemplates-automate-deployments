@@ -206,3 +206,7 @@ Update the workflow configuration, GitHub Secrets, Azure resources, and other pa
 
 #### Step 4 - Start Deploying
 Commit and push your changes to the configured collaboration branch.
+
+If deployment approvals are configured through GitHub Environments, the workflow will pause and wait for the designated reviewer(s) to approve the deployment before proceeding with the Continuous Delivery stage.
+
+If deployment approvals are not configured, the workflow will automatically continue and deploy the ARM templates to the target Azure Data Factory.
