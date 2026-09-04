@@ -21,7 +21,7 @@ jobs:
 # -------------------  
 
   Continuous-Integration:
-    name: Validate and Generate ARM Template from Source ADF
+    name: Validate and Generate ARM Template
     runs-on: windows-latest            # The type of runner that the job will run on
 
     steps:                             # Steps represent a sequence of tasks that will be executed as part of the job
@@ -108,9 +108,9 @@ jobs:
         --https-only `
         --output tsv
 
-        if (:IsNullOrWhiteSpace($sasToken)) {
+        if ([System.String]::IsNullOrWhiteSpace($sasToken)) {
           Write-Error "The storage container SAS token was not generated."
-            exit 1
+          exit 1
         }
           
         # The linked ARM template expects containerSasToken to include '?'.
