@@ -76,25 +76,22 @@ jobs:
         tenant-id: ${{ secrets.AZURE_TENANT_ID }}
         subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-    - name: Create Blob container
-      shell: pwsh
-      run: |
-        az storage container create `
-        --account-name "${{ secrets.ARM_TEMPLATE_STORAGE_ACCOUNT }}" `
-        --name "${{ secrets.ARM_TEMPLATE_CONTAINER }}" `
-        --auth-mode login `
-        --only-show-errors
-
     - name: Upload linked templates to Blob Storage
+      id: upload-templates
       shell: pwsh
       run: |
+        $folderName = "$(Get-Date -Format 'yyyyMMdd_HHmmss')-${{ github.run_id }}"
+        
         az storage blob upload-batch `
-        --account-name "${{ secrets.ARM_TEMPLATE_STORAGE_ACCOUNT }}" `
-        --destination "${{ secrets.ARM_TEMPLATE_CONTAINER }}" `
-        --source "${{ github.workspace }}\ArmTemplates\linkedTemplates" `
-        --auth-mode login `
-        --overwrite true `
-        --only-show-errors
+          --account-name "${{ secrets.ARM_TEMPLATE_STORAGE_ACCOUNT }}" `
+          --destination "${{ secrets.ARM_TEMPLATE_CONTAINER }}/$folderName" `
+          --source "${{ github.workspace }}\ArmTemplates\linkedTemplates" `
+          --auth-mode login `
+          --only-show-errors
+
+        Write-Host "Templates uploaded to folder: $folderName"
+
+        "template-folder=$folderName" >> $env:GITHUB_OUTPUT
 
     - name: Generate container SAS token
       id: storage-sas
@@ -117,21 +114,17 @@ jobs:
         }
           
         # The linked ARM template expects containerSasToken to include '?'.
-        
         if (-not $sasToken.StartsWith("?")) {
           $sasToken = "?$sasToken"
         }
 
         # Prevent the SAS token from appearing in workflow logs.
         Write-Host "::add-mask::$sasToken"
-        $containerUri = "https://${{ secrets.ARM_TEMPLATE_STORAGE_ACCOUNT }}.blob.core.windows.net/${{ secrets.ARM_TEMPLATE_CONTAINER }}"
+        
+        $containerUri = "https://${{ secrets.ARM_TEMPLATE_STORAGE_ACCOUNT }}.blob.core.windows.net/${{ secrets.ARM_TEMPLATE_CONTAINER }}/${{ steps.upload-templates.outputs.template-folder }}"
         "container-uri=$containerUri" >> $env:GITHUB_OUTPUT
         "container-sas-token=$sasToken" >> $env:GITHUB_OUTPUT
 
-
-
-
-  
     - name: Deploy ARM Template
       uses: azure/arm-deploy@v2
       with:
@@ -139,7 +132,9 @@ jobs:
         subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
         resourceGroupName: ${{ secrets.AZURE_RESOURCEGROUP_NAME }}
         template: ArmTemplates/linkedTemplates/ArmTemplate_master.json
-        parameters: > 
+        parameters: >
           ArmTemplates/linkedTemplates/ArmTemplateParameters_master.json
           factoryName=${{ secrets.DESTINATION_DATA_FACTORY }}
+          containerUri=${{ steps.storage-sas.outputs.container-uri }}
+          containerSasToken=${{ steps.storage-sas.outputs.container-sas-token }}
         deploymentMode: Incremental
